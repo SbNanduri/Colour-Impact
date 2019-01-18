@@ -1,5 +1,7 @@
 extends Area2D
 
+export var target_colour = Vector3(0.425, 0.459, 0.74)
+
 var colour_array = [1, 1, 1]
 
 var mass
@@ -39,6 +41,7 @@ func _on_Square_area_entered(area):
 			$Sprite.modulate = global.ryb2rgb(result_ryb_values)
 			
 			update_labels()
+			check_victory()
 
 
 func update_labels():
@@ -51,3 +54,11 @@ func update_labels():
 	get_parent().get_node("Labels/RYB").add_color_override("font_color", $Sprite.modulate)
 	
 	get_parent().get_node("Labels/ColorValue").add_color_override("font_color", $Sprite.modulate.darkened(0.5))
+
+func check_victory():
+	if (abs($Sprite.modulate.r - target_colour.x) < 0.01) and (abs($Sprite.modulate.g - target_colour.y) < 0.01) and (abs($Sprite.modulate.b - target_colour.z) < 0.01):
+		$Timer.start()
+
+
+func _on_Timer_timeout():
+	get_tree().change_scene("res://Menus/Victory.tscn")
