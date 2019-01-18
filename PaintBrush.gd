@@ -1,12 +1,13 @@
 extends Node2D
 
-const ADDITIONAL_LIMIT = 1400
+const ADDITIONAL_LIMIT = 1400		# How far off the screen the paintbrush needs to go before being deleted
 
 var default_acceleration_magnitude = 100 setget _set_default_acceleration_magnitude
 var square_pos = Vector2()
 var flipped = false
 var velocity = -Vector2(100, 0)
 var angular_velocity = 0
+const MAX_ANGULAR_VELOCITY = 4
 var acceleration = -Vector2(default_acceleration_magnitude, 0)
 var type = "PaintBrush"
 var colour_weight = 0.5 	# The weight to apply in the lerp function when changing the square's colour
@@ -16,7 +17,7 @@ var mass = 5
 var test = true
 
 # Painting variables
-var painting = false		# When it is painting the square
+var repel = false		# When it enters the square, it should be repelled by it so that it can turn around and paint it
 
 
 
@@ -33,13 +34,9 @@ func _ready():
 	connect("should_be_deleted", get_parent(), "refresh_gravitation_group")
 
 func _physics_process(delta):
-	if not painting:
-		general_movement(delta)
-	else:
-		acceleration = acceleration.rotated(angular_velocity * delta)
-		rotation += angular_velocity * delta
-		velocity = acceleration * delta + velocity
-		position += velocity * delta
+
+	general_movement(delta)
+
 
 
 func general_movement(delta):
@@ -53,16 +50,21 @@ func general_movement(delta):
 				pos = body.get_parent().rect_position
 			else:
 				pos = body.position
-			if position.distance_squared_to(pos) <= 10:
-				acceleration_magnitude = 70
+			if position.distance_squared_to(pos) <= 0.00001:
+				acceleration_magnitude = 20
 			else:
-				acceleration_magnitude = 6*pow(10, -5) * body.mass / position.distance_squared_to(pos)
+				acceleration_magnitude = min(6*pow(10, -5) * body.mass / position.distance_squared_to(pos), 20)
+			if repel:
+				acceleration_magnitude = - acceleration_magnitude
 			
 			acceleration += (pos - position).normalized() * acceleration_magnitude
 
-
 	var new_rotation = lerp(abs(rotation), abs(acceleration.angle()), 1) * sign(acceleration.angle())
 	angular_velocity = (new_rotation - rotation) / delta
+	
+	# Makes sure that the brush does not spin too fast
+	if abs(angular_velocity) > MAX_ANGULAR_VELOCITY and abs(angular_velocity) < 360 - MAX_ANGULAR_VELOCITY:
+		new_rotation = (delta * sign(angular_velocity)*MAX_ANGULAR_VELOCITY + rotation)
 	rotation = new_rotation
 	velocity = acceleration * delta + velocity
 	position += velocity * delta
@@ -87,4 +89,4 @@ func check_out_of_bounds():
 
 func _on_Handle_area_entered(area):
 	if area.name == 'Square':
-		painting = true
+		repel = true
