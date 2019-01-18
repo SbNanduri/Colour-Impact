@@ -88,3 +88,11 @@ static func ryb2rgb(colour_values):
 	b += w
 	
 	return Color(r, g, b)
+
+func menu_transition_to_scene(path):
+	# start screen capture
+	var img = get_viewport().get_texture().get_data()
+	img.flip_y()
+	# get screen capture
+	global.previous_screen_image = img
+	get_tree().change_scene(path)
