@@ -1,31 +1,41 @@
 extends CanvasLayer
 
-export var colour = Color(1, 1, 1) setget _set_colour
+onready var colour = Color(1, 1, 1) setget _set_colour
+var path
 
 func _ready():
-	if global.previous_screen_image != null:
-		$DryingPaint.visible = true
-		$PreviousScreenTexture.visible = true
-		$PaintRoller/Particles2D.emitting = true
-		var itex = ImageTexture.new()
-		itex.create_from_image(global.previous_screen_image)
-		$PreviousScreenTexture.set_texture(itex)
-		yield(get_tree(), "idle_frame")
-		yield(get_tree(), "idle_frame")
-		$TransitionPlayer.play("transition")
+	if global.transition_colour != null:
+		self.colour = global.transition_colour
+		$TransitionPlayer.play("fade in")
+		$PaintRollerRoller/Particles2D.emitting = true
 	else:
+		$AppliedPaint.visible = false
 		$DryingPaint.visible = false
-		$PreviousScreenTexture.visible = false
-		$PaintRoller/Particles2D.emitting = false
+		$PaintRollerRoller/Particles2D.emitting = false
+
 
 func _on_TransitionPlayer_animation_finished(anim_name):
-	$DryingPaint.visible = false
-	$PreviousScreenTexture.visible = false
-	$PaintRoller/Particles2D.emitting = false
+	if anim_name == 'fade in':
+		$AppliedPaint.visible = false
+		$PaintRollerRoller/Particles2D.emitting = false
+	if anim_name == 'fade out':
+		perform_scene_change()
+		
+		
+func transition_to_scene(received_path, colour):
+	path = received_path
+	global.transition_colour = colour
+	self.colour = colour
+	$TransitionPlayer.play("fade out")
+	
 
+func perform_scene_change():
+	get_tree().change_scene(path)
+	
 func _set_colour(value):
 	colour = value
-	if has_node("DryingPaint"):
-		$DryingPaint.color = colour
-		$PaintRoller/Particles2D.modulate = colour
-		$PaintRoller.modulate = colour
+
+	$AppliedPaint.color = colour
+	$DryingPaint.color = colour
+	$PaintRollerRoller/Particles2D.modulate = colour
+	$PaintRollerRoller.modulate = colour

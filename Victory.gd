@@ -9,8 +9,11 @@ func _ready():
 	# Initialization here
 	pass
 
+#func _process(delta):
+#	# Called every frame. Delta is time since last frame.
+#	# Update game logic here.
+#	pass
 
 
-
-func _on_BackButton_pressed():
+func _on_Button_pressed():
 	$TransitionEffect.transition_to_scene("res://Menus/MainMenu.tscn", Color(1, 0, 0))

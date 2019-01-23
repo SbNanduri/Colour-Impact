@@ -14,19 +14,15 @@ func _ready():
 	connect("to_spawn_missile", get_node("../../Brushes"), "spawn_missile")
 
 func _process(delta):
-	if Input.is_key_pressed(KEY_R):
-		colour = Color(1, 0, 0)
-	if Input.is_key_pressed(KEY_G):
-		colour = Color(0, 1, 0)
-	if Input.is_key_pressed(KEY_B):
-		colour = Color(0, 0, 1)
-	if Input.is_key_pressed(KEY_Y):
-		colour = global.ryb2rgb([0, 1, 0])
+	
+	if Input.is_action_just_pressed("touch"):
+		initial_pos = get_viewport().get_mouse_position()
+		var space_state = get_world_2d().direct_space_state
+		var result = space_state.intersect_point(initial_pos)
+		for i in result:
+			if i['collider'] == self:
+				dragging = true
 		
-	if mouse_in_area:
-		if Input.is_action_just_pressed("touch"):
-			dragging = true
-			initial_pos = get_viewport().get_mouse_position()
 	if Input.is_action_just_released("touch") and dragging:
 		dragging = false
 		final_pos = get_viewport().get_mouse_position()
@@ -39,3 +35,7 @@ func _on_RightArea_mouse_entered():
 
 func _on_RightArea_mouse_exited():
 	mouse_in_area = false
+
+
+func _on_ColourButtons_colour_change(new_colour):
+	colour = new_colour

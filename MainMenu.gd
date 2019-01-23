@@ -2,8 +2,6 @@ extends Control
 
 
 func _ready():
-	# Called when the node is added to the scene for the first time.
-	# Initialization here
 	pass
 
 #func _process(delta):
@@ -12,7 +10,11 @@ func _ready():
 #	pass
 
 func _on_Options_pressed():
-	global.menu_transition_to_scene("res://Menus/Options.tscn")
+	$TransitionEffect.transition_to_scene("res://Menus/Options.tscn", Color(1, 0.8, 0))
 
 func _on_Game_pressed():
-	global.menu_transition_to_scene("res://Main.tscn")
+	$TransitionEffect.transition_to_scene("res://Main.tscn", Color(0, 1, 0))
+
+
+func _on_HowToPlay_pressed():
+	$TransitionEffect.transition_to_scene("res://Menus/HowToPlay.tscn", Color(0.76, 0.05, 0.84))

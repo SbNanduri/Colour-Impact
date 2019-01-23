@@ -16,6 +16,6 @@ func _ready():
 func _on_Booster_area_entered(area):
 	var parent = area.get_parent()
 	if parent.get("type"):
-		if (parent.type == "PaintBrush") and (not parent.painting):
+		if (parent.type == "PaintBrush") and (not parent.repel):
 			parent.default_acceleration_magnitude *= boost_amount
 			queue_free()
